@@ -4,6 +4,7 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns 
+from sklearn.linear_model import LogisticRegression
 
 ########################### BEGIN LOAD DATA
 #Load data
@@ -23,35 +24,48 @@ training_data = pd.read_csv(training_data_filename,index_col = 0)
 #training_data_lightweight.to_csv(lightweight_training_data_filename)
 
 #Get the new shape of the data file. Inspect the first few elements.
-print('Shape of training data: ',training_data.shape)
-print(training_data.head(3))
+#print('Shape of training data: ',training_data.shape)
+#print(training_data.head(3))
 
 #Separate target and predictor columns
 X_train = training_data.copy()
 y_train = training_data['label'].ravel()
 X_train.drop('label',1,inplace=True)
 
-
 ############################ END LOAD DATA
 
 ################################ BEGIN PLOTTING
-#Plot a subset of the data
+##Plot a subset of the data
 
-#Set aesthetic theme
-sns.set_style('dark')
+##Set aesthetic theme
+#sns.set_style('dark')
 
-#Create 10 subplots
-n_sp_row = 2
-n_sp_col = 5
-fig,axes = plt.subplots(n_sp_row,n_sp_col,figsize = (n_sp_col,n_sp_row))
+##Create 10 subplots
+#n_sp_row = 2
+#n_sp_col = 5
+#fig,axes = plt.subplots(n_sp_row,n_sp_col,figsize = (n_sp_col,n_sp_row))
 
-n_digits_show = n_sp_row*n_sp_col
-for i in range(n_sp_row):
-	for j in range(n_sp_col):
-		axes[i][j].imshow(X_train.values[(i*n_sp_row + j),:].reshape(28,28),
-		cmap='gray_r',interpolation='nearest')
-		axes[i][j].set_yticks([])
-		axes[i][j].set_xticks([])
-plt.show()
+#n_digits_show = n_sp_row*n_sp_col
+#for i in range(n_sp_row):
+#	for j in range(n_sp_col):
+#		axes[i][j].imshow(X_train.values[(i*n_sp_row + j),:].reshape(28,28),
+#		cmap='gray_r',interpolation='nearest')
+#		axes[i][j].set_yticks([])
+#		axes[i][j].set_xticks([])
+#plt.show()
+
+##Check distribution of digits
+#sns.countplot(x='label',data=training_data)
+#plt.show()
 
 ################################ END PLOTTING
+
+################################ BEGIN FITTING
+C = 1.0 #Regularisation parameter
+multi_class = 'ovr'
+penalty = 'l2'
+fit_intercept = True
+
+lr_classifier = LogisticRegression(C=C,multi_class=multi_class,penalty = penalty,fit_intercept = fit_intercept)
+
+################################ END FITTING
