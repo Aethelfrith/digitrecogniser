@@ -26,7 +26,9 @@ def write_proportion_of_rows_to_file(df,write_filename,perc_rows_keep = 1):
 #Set options for what to do
 is_lighten_data = False
 is_plot_data = False
-is_fit_predict = True
+#classifier_method = None
+classifier_method = 'logreg'
+#Classifier method either None, logreg, 
 
 #If should remove digits, do so first
 if is_lighten_data:
@@ -38,7 +40,7 @@ if is_lighten_data:
 	
 	#Remove some columns and write to file to enable a lightweight input file
 	lightweight_trainval_data_filename = './trainlight.csv'
-	perc_keep_trainval = 0.03
+	perc_keep_trainval = 0.1
 	write_proportion_of_rows_to_file(trainval_data,lightweight_trainval_data_filename,
 	perc_rows_keep = perc_keep_trainval)
 	
@@ -99,10 +101,10 @@ if is_plot_data:
 ################################ END PLOTTING
 
 ################################ BEGIN FITTING AND PREDICTION
-if is_fit_predict:
-	C = 1.0 #Regularisation parameter
+if classifier_method == 'logreg':
+	C = 1 #Regularisation parameter
 	multi_class = 'ovr'
-	penalty = 'l2'
+	penalty = 'l1'
 	fit_intercept = True
 	tol = 1e-3
 	max_iter = 100
@@ -116,6 +118,10 @@ if is_fit_predict:
 	y_pred = lr_classifier.predict(X_valid)
 
 	print(classification_report(y_valid,y_pred))
+elif classifier_method is None:
+	#Donothing
+else:
+	print("Invalid classifier method string passed") 
 
 ################################ END FITTING AND PREDICTION
 
