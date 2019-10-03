@@ -9,9 +9,11 @@ from sklearn.metrics import classification_report
 
 ########################### BEGIN LOAD DATA
 
-#If should remove digits, do so first
+#Set options for what to do
 is_lighten_data = False
+is_plot_data = False
 
+#If should remove digits, do so first
 if is_lighten_data:
 	training_data_filename = './train.csv'
 	training_data = pd.read_csv(training_data_filename)
@@ -26,24 +28,9 @@ if is_lighten_data:
 else:
 	training_data_filename = './trainlight.csv'
 	training_data = pd.read_csv(training_data_filename,index_col = 0)
-	
-
-#Load data
-#training_data_filename = './train.csv'
-#training_data = pd.read_csv(training_data_filename)
-
-
 
 #test_data_filename = './test.csv'
 #test_data = pd.read_csv(test_data_filename)
-
-##Remove some columns and write to file to enable a lightweight input file
-#n_digits_full = training_data.shape[0]
-#perc_digits_keep = 0.03
-#n_digits_keep = np.ceil(perc_digits_keep*n_digits_full).astype(int)
-#training_data_lightweight = training_data.iloc[0:(n_digits_keep-1),:]
-#lightweight_training_data_filename = './trainlight.csv'
-#training_data_lightweight.to_csv(lightweight_training_data_filename)
 
 #Get the new shape of the data file. Inspect the first few elements.
 print('Shape of training data: ',training_data.shape)
@@ -57,48 +44,49 @@ X_train.drop('label',1,inplace=True)
 ############################ END LOAD DATA
 
 ################################ BEGIN PLOTTING
-##Plot a subset of the data
+if is_plot_data:
+	#Plot a subset of the data
 
-##Set aesthetic theme
-#sns.set_style('dark')
+	#Set aesthetic theme
+	sns.set_style('dark')
 
-##Create 10 subplots
-#n_sp_row = 2
-#n_sp_col = 5
-#fig,axes = plt.subplots(n_sp_row,n_sp_col,figsize = (n_sp_col,n_sp_row))
+	#Create 10 subplots
+	n_sp_row = 2
+	n_sp_col = 5
+	fig,axes = plt.subplots(n_sp_row,n_sp_col,figsize = (n_sp_col,n_sp_row))
 
-#n_digits_show = n_sp_row*n_sp_col
-#for i in range(n_sp_row):
-#	for j in range(n_sp_col):
-#		axes[i][j].imshow(X_train.values[(i*n_sp_row + j),:].reshape(28,28),
-#		cmap='gray_r',interpolation='nearest')
-#		axes[i][j].set_yticks([])
-#		axes[i][j].set_xticks([])
-#plt.show()
+	n_digits_show = n_sp_row*n_sp_col
+	for i in range(n_sp_row):
+		for j in range(n_sp_col):
+			axes[i][j].imshow(X_train.values[(i*n_sp_row + j),:].reshape(28,28),
+			cmap='gray_r',interpolation='nearest')
+			axes[i][j].set_yticks([])
+			axes[i][j].set_xticks([])
+	plt.show()
 
-##Check distribution of digits
-#sns.countplot(x='label',data=training_data)
-#plt.show()
+	#Check distribution of digits
+	sns.countplot(x='label',data=training_data)
+	plt.show()
 
 ################################ END PLOTTING
 
 ################################ BEGIN FITTING AND PREDICTION
-#C = 1.0 #Regularisation parameter
-#multi_class = 'ovr'
-#penalty = 'l2'
-#fit_intercept = True
-#tol = 1e-3
-#max_iter = 100
-#solver = 'liblinear'
+C = 1.0 #Regularisation parameter
+multi_class = 'ovr'
+penalty = 'l2'
+fit_intercept = True
+tol = 1e-3
+max_iter = 100
+solver = 'liblinear'
 
-#lr_classifier = LogisticRegression(C=C,multi_class=multi_class,penalty = penalty,fit_intercept = fit_intercept, max_iter = max_iter, tol=tol, solver = solver)
+lr_classifier = LogisticRegression(C=C,multi_class=multi_class,penalty = penalty,fit_intercept = fit_intercept, max_iter = max_iter, tol=tol, solver = solver)
 
-#lr_classifier.fit(X_train,y_train)
+lr_classifier.fit(X_train,y_train)
 
-##Do predictions
-#y_pred = lr_classifier.predict(X_train)
+#Do predictions
+y_pred = lr_classifier.predict(X_train)
 
-#classification_report(y_train,y_pred)
+classification_report(y_train,y_pred)
 
 ################################ END FITTING AND PREDICTION
 
