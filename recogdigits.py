@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns 
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import classification_report
+from sklearn.model_selection import train_test_split
 
 ########################### BEGIN FUNCTION DEFINITIONS 
 
@@ -29,17 +30,17 @@ is_fit_predict = True
 
 #If should remove digits, do so first
 if is_lighten_data:
-	training_data_filename = './train.csv'
-	training_data = pd.read_csv(training_data_filename)
+	trainval_data_filename = './train.csv'
+	trainval_data = pd.read_csv(trainval_data_filename)
 	
 	test_data_filename = './test.csv'
 	test_data = pd.read_csv(test_data_filename)
 	
 	#Remove some columns and write to file to enable a lightweight input file
-	lightweight_training_data_filename = './trainlight.csv'
-	perc_keep_training = 0.03
-	write_proportion_of_rows_to_file(training_data,lightweight_training_data_filename,
-	perc_rows_keep = perc_keep_training)
+	lightweight_trainval_data_filename = './trainlight.csv'
+	perc_keep_trainval = 0.03
+	write_proportion_of_rows_to_file(trainval_data,lightweight_trainval_data_filename,
+	perc_rows_keep = perc_keep_trainval)
 	
 	lightweight_test_data_filename = './testlight.csv'
 	perc_keep_test = 0.2
@@ -47,22 +48,24 @@ if is_lighten_data:
 	perc_rows_keep = perc_keep_test)
 	
 else:
-	training_data_filename = './trainlight.csv'
-	training_data = pd.read_csv(training_data_filename,index_col = 0)
+	trainval_data_filename = './trainlight.csv'
+	trainval_data = pd.read_csv(trainval_data_filename,index_col = 0)
 	test_data_filename = './testlight.csv'
 	test_data = pd.read_csv(test_data_filename,index_col = 0)
 
-#test_data_filename = './test.csv'
-#test_data = pd.read_csv(test_data_filename)
 
-#Get the new shape of the data file. Inspect the first few elements.
-print('Shape of training data: ',training_data.shape)
-print(training_data.head(3))
+#Get the shape of the data file. Inspect the first few elements.
+print('Shape of training data: ',trainval_data.shape)
+print(trainval_data.head(3))
 
 #Separate target and predictor columns
-X_train = training_data.copy()
-y_train = training_data['label'].ravel()
-X_train.drop('label',1,inplace=True)
+X_trainval = trainval_data.copy()
+y_trainval = trainval_data['label'].ravel()
+X_trainval.drop('label',1,inplace=True)
+
+valid_size = 0.2
+tts_random_state = None
+X_train, X_valid, y_train, y_valid = train_test_split(X_trainval, y_trainval, test_size = valid_size, random_state = tts_random_state)
 
 X_test = test_data.copy()
 
@@ -110,9 +113,9 @@ if is_fit_predict:
 	lr_classifier.fit(X_train,y_train)
 
 	#Do predictions
-	y_pred = lr_classifier.predict(X_train)
+	y_pred = lr_classifier.predict(X_valid)
 
-	print(classification_report(y_train,y_pred))
+	print(classification_report(y_valid,y_pred))
 
 ################################ END FITTING AND PREDICTION
 
