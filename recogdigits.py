@@ -7,27 +7,50 @@ import seaborn as sns
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import classification_report
 
+########################### BEGIN FUNCTION DEFINITIONS 
+
+def write_proportion_of_rows_to_file(df,write_filename,perc_rows_keep = 1):
+	"Write an approximate percentage of rows from a dataframe to a file"
+	n_rows_full = df.shape[0]
+	n_rows_keep = np.ceil(perc_rows_keep*n_rows_full).astype(int)
+	df_lightweight = df.iloc[0:(n_rows_keep-1),:]
+	df_lightweight.to_csv(write_filename)
+	#Could refactor to return status code
+	return None
+
+########################### END FUNCTION DEFINITIONS
+
 ########################### BEGIN LOAD DATA
 
 #Set options for what to do
 is_lighten_data = False
 is_plot_data = False
+is_fit_predict = True
 
 #If should remove digits, do so first
 if is_lighten_data:
 	training_data_filename = './train.csv'
 	training_data = pd.read_csv(training_data_filename)
 	
+	test_data_filename = './test.csv'
+	test_data = pd.read_csv(test_data_filename)
+	
 	#Remove some columns and write to file to enable a lightweight input file
-	n_digits_full = training_data.shape[0]
-	perc_digits_keep = 0.03
-	n_digits_keep = np.ceil(perc_digits_keep*n_digits_full).astype(int)
-	training_data_lightweight = training_data.iloc[0:(n_digits_keep-1),:]
 	lightweight_training_data_filename = './trainlight.csv'
-	training_data_lightweight.to_csv(lightweight_training_data_filename)
+	perc_keep_training = 0.03
+	write_proportion_of_rows_to_file(training_data,lightweight_training_data_filename,
+	perc_rows_keep = perc_keep_training)
+	
+	lightweight_test_data_filename = './testlight.csv'
+	perc_keep_test = 0.2
+	write_proportion_of_rows_to_file(test_data,lightweight_test_data_filename,
+	perc_rows_keep = perc_keep_test)
+	
 else:
 	training_data_filename = './trainlight.csv'
 	training_data = pd.read_csv(training_data_filename,index_col = 0)
+	test_data_filename = './testlight.csv'
+	test_data = pd.read_csv(test_data_filename,index_col = 0)
 
 #test_data_filename = './test.csv'
 #test_data = pd.read_csv(test_data_filename)
@@ -40,6 +63,8 @@ print(training_data.head(3))
 X_train = training_data.copy()
 y_train = training_data['label'].ravel()
 X_train.drop('label',1,inplace=True)
+
+X_test = test_data.copy()
 
 ############################ END LOAD DATA
 
@@ -71,22 +96,23 @@ if is_plot_data:
 ################################ END PLOTTING
 
 ################################ BEGIN FITTING AND PREDICTION
-C = 1.0 #Regularisation parameter
-multi_class = 'ovr'
-penalty = 'l2'
-fit_intercept = True
-tol = 1e-3
-max_iter = 100
-solver = 'liblinear'
+if is_fit_predict:
+	C = 1.0 #Regularisation parameter
+	multi_class = 'ovr'
+	penalty = 'l2'
+	fit_intercept = True
+	tol = 1e-3
+	max_iter = 100
+	solver = 'liblinear'
 
-lr_classifier = LogisticRegression(C=C,multi_class=multi_class,penalty = penalty,fit_intercept = fit_intercept, max_iter = max_iter, tol=tol, solver = solver)
+	lr_classifier = LogisticRegression(C=C,multi_class=multi_class,penalty = penalty,fit_intercept = fit_intercept, max_iter = max_iter, tol=tol, solver = solver)
 
-lr_classifier.fit(X_train,y_train)
+	lr_classifier.fit(X_train,y_train)
 
-#Do predictions
-y_pred = lr_classifier.predict(X_train)
+	#Do predictions
+	y_pred = lr_classifier.predict(X_train)
 
-classification_report(y_train,y_pred)
+	print(classification_report(y_train,y_pred))
 
 ################################ END FITTING AND PREDICTION
 
