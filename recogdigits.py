@@ -5,27 +5,49 @@ import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns 
 from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import classification_report
 
 ########################### BEGIN LOAD DATA
+
+#If should remove digits, do so first
+is_lighten_data = False
+
+if is_lighten_data:
+	training_data_filename = './train.csv'
+	training_data = pd.read_csv(training_data_filename)
+	
+	#Remove some columns and write to file to enable a lightweight input file
+	n_digits_full = training_data.shape[0]
+	perc_digits_keep = 0.03
+	n_digits_keep = np.ceil(perc_digits_keep*n_digits_full).astype(int)
+	training_data_lightweight = training_data.iloc[0:(n_digits_keep-1),:]
+	lightweight_training_data_filename = './trainlight.csv'
+	training_data_lightweight.to_csv(lightweight_training_data_filename)
+else:
+	training_data_filename = './trainlight.csv'
+	training_data = pd.read_csv(training_data_filename,index_col = 0)
+	
+
 #Load data
 #training_data_filename = './train.csv'
-training_data_filename = './trainlight.csv'
-training_data = pd.read_csv(training_data_filename,index_col = 0)
+#training_data = pd.read_csv(training_data_filename)
+
+
 
 #test_data_filename = './test.csv'
 #test_data = pd.read_csv(test_data_filename)
 
 ##Remove some columns and write to file to enable a lightweight input file
 #n_digits_full = training_data.shape[0]
-#perc_digits_keep = 0.1
+#perc_digits_keep = 0.03
 #n_digits_keep = np.ceil(perc_digits_keep*n_digits_full).astype(int)
 #training_data_lightweight = training_data.iloc[0:(n_digits_keep-1),:]
 #lightweight_training_data_filename = './trainlight.csv'
 #training_data_lightweight.to_csv(lightweight_training_data_filename)
 
 #Get the new shape of the data file. Inspect the first few elements.
-#print('Shape of training data: ',training_data.shape)
-#print(training_data.head(3))
+print('Shape of training data: ',training_data.shape)
+print(training_data.head(3))
 
 #Separate target and predictor columns
 X_train = training_data.copy()
@@ -60,12 +82,24 @@ X_train.drop('label',1,inplace=True)
 
 ################################ END PLOTTING
 
-################################ BEGIN FITTING
-C = 1.0 #Regularisation parameter
-multi_class = 'ovr'
-penalty = 'l2'
-fit_intercept = True
+################################ BEGIN FITTING AND PREDICTION
+#C = 1.0 #Regularisation parameter
+#multi_class = 'ovr'
+#penalty = 'l2'
+#fit_intercept = True
+#tol = 1e-3
+#max_iter = 100
+#solver = 'liblinear'
 
-lr_classifier = LogisticRegression(C=C,multi_class=multi_class,penalty = penalty,fit_intercept = fit_intercept)
+#lr_classifier = LogisticRegression(C=C,multi_class=multi_class,penalty = penalty,fit_intercept = fit_intercept, max_iter = max_iter, tol=tol, solver = solver)
 
-################################ END FITTING
+#lr_classifier.fit(X_train,y_train)
+
+##Do predictions
+#y_pred = lr_classifier.predict(X_train)
+
+#classification_report(y_train,y_pred)
+
+################################ END FITTING AND PREDICTION
+
+
